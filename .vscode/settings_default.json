@@ -1,0 +1,32 @@
+{
+    "files.associations": {
+        "*.inc": "c",
+        "*.tcc": "c",
+        "array": "c",
+        "cstdlib": "c",
+        "directory.h": "c",
+        "file.h": "c",
+        "filesys.h": "c",
+        "fstream": "c",
+        "hash_map": "c",
+        "hash_set": "c",
+        "init.h": "c",
+        "initializer_list": "c",
+        "list.h": "c",
+        "off_t.h": "c",
+        "process.h": "c",
+        "pte.h": "c",
+        "stdint.h": "c",
+        "string_view": "c",
+        "stdbool.h": "c",
+        "stdio.h": "c",
+        "synch.h": "c",
+        "syscall.h": "c",
+        "syscall-nr.h": "c",
+        "thread.h": "c",
+        "tss.h": "c",
+        "utility": "c",
+        "vaddr.h": "c",
+        "vm.h": "c"
+    }
+}
