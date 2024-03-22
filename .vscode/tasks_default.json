@@ -1,0 +1,114 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Debug PintOS",
+      "dependsOn": [
+        "Configure QEMU Setting",
+        "Run QEMU"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "Run QEMU",
+      "type": "shell",
+      "command": [
+        "${workspaceFolder}/utils/pintos"
+      ],
+      "args": [],
+      "options": {
+        "cwd": "${workspaceFolder}/${input:project}/build"
+      },
+      "dependsOn": [
+        "Build PintOS"
+      ],
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": ".",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "."
+          }
+        }
+      ]
+    },
+    {
+      "label": "Configure QEMU Setting",
+      "command": "${workspaceFolder}/utils/vscode-argument-builder",
+      "args": [
+        "${input:filename}",
+        "${input:project}",
+        "${workspaceRoot}",
+        "Run QEMU"
+      ],
+      "dependsOn": [
+        "Update Exec File List"
+      ]
+    },
+    {
+      "label": "Update Exec File List",
+      "command": "${workspaceFolder}/utils/vscode-filename-configurator",
+      "args": [
+        "exec",
+        "${input:project}",
+        "${workspaceFolder}",
+        "filename"
+      ],
+      "dependsOn": [
+        "Build PintOS"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "Build PintOS",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/${input:project}"
+      },
+      "command": [
+        "make"
+      ],
+      "args": [
+        "-j$(nproc)"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "project",
+      "description": "[tasks] Enter the project to start.",
+      "type": "pickString",
+      "options": [
+        "threads",
+        "userprog",
+        "vm",
+        "filesys"
+      ],
+      "default": "vm"
+    },
+    {
+      "id": "filename",
+      "description": "[tasks] Pick the user program to start.",
+      "type": "pickString",
+      "options": []
+    },
+    {
+      "id": "args",
+      "description": "[tasks] Enter arguments.",
+      "type": "promptString"
+    }
+  ]
+}
