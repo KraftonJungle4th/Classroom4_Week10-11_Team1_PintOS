@@ -1,0 +1,44 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) Debug PintOS",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/${input:project}/build/kernel.o",
+      "MIMode": "gdb",
+      "stopAtEntry": true,
+      "cwd": "${workspaceFolder}",
+      "targetArchitecture": "x86_64",
+      "externalConsole": true,
+      "miDebuggerServerAddress": "localhost:1234",
+      "setupCommands": [
+        {
+          "text": "-enable-pretty-printing",
+          "description": "Enable pretty-printing for gdb",
+          "ignoreFailures": true
+        },
+        {
+          "text": "-gdb-set disassembly-flavor intel",
+          "description": "Set Disassembly Flavor to Intel",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "Debug PintOS"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "project",
+      "description": "[launch] Enter the project to start.",
+      "type": "pickString",
+      "options": [
+        "threads",
+        "userprog",
+        "vm",
+        "filesys"
+      ],
+      "default": "vm"
+    }
+  ]
+}
