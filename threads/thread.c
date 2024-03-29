@@ -306,7 +306,7 @@ thread_exit (void) {
    may be scheduled again immediately at the scheduler's whim. */
 void
 thread_yield (void) {
-    // msg("스레드가 CPU 양보");
+    msg("스레드가 CPU 양보");
 	struct thread *curr = thread_current ();
 	enum intr_level old_level;
 
@@ -325,7 +325,7 @@ thread_yield (void) {
 void
 thread_sleep_til (int64_t ticks)
 {
-    // msg("스레드가 잔다.");
+
     struct thread *curr = thread_current ();
     curr->wakeup_tick = ticks; 
 
@@ -336,6 +336,7 @@ thread_sleep_til (int64_t ticks)
     old_level = intr_disable ();
     if (curr != idle_thread)
     {
+        msg("스레드가 잔다");
         list_insert_ordered(&sleep_list, &curr->elem, tick_less, NULL);
     }
 
@@ -346,7 +347,6 @@ thread_sleep_til (int64_t ticks)
 void
 thread_wakeup (int64_t ticks)
 {   
-    // msg("스레드가 깬다.");
 
     enum intr_level old_level;
     ASSERT (intr_context ());
@@ -359,6 +359,8 @@ thread_wakeup (int64_t ticks)
         struct thread * ptr = list_entry(e, struct thread, elem);
         if (ptr->wakeup_tick <= ticks)
         {
+            msg("스레드가 깬다");
+
             list_pop_front(&sleep_list);
 
             thread_unblock(ptr);
