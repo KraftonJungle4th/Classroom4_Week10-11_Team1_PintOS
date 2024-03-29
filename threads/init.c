@@ -80,16 +80,16 @@ main (void) {
     /* Initialize ourselves as a thread so we can use locks,
        then enable console locking. */
     thread_init ();
-    printf ("쓰레드 객체 초기화\n");
+    // printf ("쓰레드 객체 초기화\n");
     console_init ();
-    printf ("콘솔 초기화\n");
+    // printf ("콘솔 초기화\n");
 
     /* Initialize memory system. */
     mem_end = palloc_init ();
     malloc_init ();
-    printf ("메모리 할당 시스템 초기화\n");
+    // printf ("메모리 할당 시스템 초기화\n");
     paging_init (mem_end);
-    printf ("페이지 시스템 초기화\n");
+    // printf ("페이지 시스템 초기화\n");
 
 #ifdef USERPROG
     tss_init ();
@@ -98,24 +98,24 @@ main (void) {
 
     /* Initialize interrupt handlers. */
     intr_init ();
-    printf ("인터럽트 객체 초기화\n");
+    // printf ("인터럽트 객체 초기화\n");
     timer_init ();
-    printf ("타이머 인터럽트 초기화\n");
+    // printf ("타이머 인터럽트 초기화\n");
     kbd_init ();
-    printf ("키보드 인터럽트 초기화\n");
+    // printf ("키보드 인터럽트 초기화\n");
     input_init();
-    printf ("입력 인터럽트 초기화\n");
+    // printf ("입력 인터럽트 초기화\n");
 #ifdef USERPROG
     exception_init();
     syscall_init();
 #endif
     /* Start thread scheduler and enable interrupts. */
     thread_start ();
-    printf ("쓰레드 시스템 초기화\n");
+    // printf ("쓰레드 시스템 초기화\n");
     serial_init_queue();
-    printf (" 직렬포트기기 초기화\n");
+    // printf (" 직렬포트기기 초기화\n");
     timer_calibrate();
-    printf ("타이머 조정\n");
+    // printf ("타이머 조정\n");
 
 #ifdef FILESYS
     /* Initialize file system. */
@@ -136,7 +136,7 @@ main (void) {
     if (power_off_when_done)
     {
         power_off ();
-        printf ("컴퓨터 끄는중...\n");
+        // printf ("컴퓨터 끄는중...\n");
     }
     thread_exit ();
 }

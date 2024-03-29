@@ -90,7 +90,7 @@ timer_elapsed (int64_t then) {
 /* Suspends execution for approximately TICKS timer ticks. */
 void
 timer_sleep (int64_t ticks) {
-    msg("타이머가 재운다");
+    // msg("타이머가 재운다");
 	int64_t start = timer_ticks ();
 
 	ASSERT (intr_get_level () == INTR_ON);
@@ -105,7 +105,7 @@ timer_sleep (int64_t ticks) {
 void
 timer_wakeup (int64_t end)
 {
-    msg("타이머가 깨운다");
+    // msg("타이머가 깨운다");
     ASSERT (intr_get_level () == INTR_OFF);
 
     thread_wakeup (end);
