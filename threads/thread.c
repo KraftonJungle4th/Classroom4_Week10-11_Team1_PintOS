@@ -11,6 +11,9 @@
 #include "threads/synch.h"
 #include "threads/vaddr.h"
 #include "intrinsic.h"
+
+#include <list.h>
+
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
@@ -27,6 +30,8 @@
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
 static struct list ready_list;
+
+static struct list sleep_list;
 
 /* Idle thread. */
 static struct thread *idle_thread;
@@ -62,6 +67,8 @@ static void init_thread (struct thread *, const char *name, int priority);
 static void do_schedule(int status);
 static void schedule (void);
 static tid_t allocate_tid (void);
+static bool tick_less(const struct list_elem *, const struct list_elem *);
+static bool priority_more(const struct list_elem *, const struct list_elem *);
 
 /* Returns true if T appears to point to a valid thread. */
 #define is_thread(t) ((t) != NULL && (t)->magic == THREAD_MAGIC)
@@ -107,7 +114,10 @@ thread_init (void) {
 
 	/* Init the globla thread context */
 	lock_init (&tid_lock);
+
 	list_init (&ready_list);
+	list_init (&sleep_list);
+
 	list_init (&destruction_req);
 
 	/* Set up a thread structure for the running thread. */
@@ -240,7 +250,7 @@ thread_unblock (struct thread *t) {
 
 	old_level = intr_disable ();
 	ASSERT (t->status == THREAD_BLOCKED);
-	list_push_back (&ready_list, &t->elem);
+    list_insert_ordered(&ready_list, &t->elem, priority_more, NULL);
 	t->status = THREAD_READY;
 	intr_set_level (old_level);
 }
@@ -296,6 +306,7 @@ thread_exit (void) {
    may be scheduled again immediately at the scheduler's whim. */
 void
 thread_yield (void) {
+    // msg("스레드가 CPU 양보");
 	struct thread *curr = thread_current ();
 	enum intr_level old_level;
 
@@ -303,9 +314,60 @@ thread_yield (void) {
 
 	old_level = intr_disable ();
 	if (curr != idle_thread)
-		list_push_back (&ready_list, &curr->elem);
+	{	
+        list_insert_ordered(&ready_list, &curr->elem, priority_more, NULL);
+	}
+		
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
+}
+
+void
+thread_sleep_til (int64_t ticks)
+{
+    // msg("스레드가 잔다.");
+    struct thread *curr = thread_current ();
+    curr->wakeup_tick = ticks; 
+
+    enum intr_level old_level;
+
+    ASSERT (!intr_context ());
+
+    old_level = intr_disable ();
+    if (curr != idle_thread)
+    {
+        list_insert_ordered(&sleep_list, &curr->elem, tick_less, NULL);
+    }
+
+	thread_block();
+    intr_set_level (old_level);
+}
+
+void
+thread_wakeup (int64_t ticks)
+{   
+    // msg("스레드가 깬다.");
+
+    enum intr_level old_level;
+    ASSERT (intr_context ());
+    old_level = intr_disable ();
+
+    while (!(list_empty(&sleep_list)))
+    {
+        struct list_elem * e = list_begin(&sleep_list);
+
+        struct thread * ptr = list_entry(e, struct thread, elem);
+        if (ptr->wakeup_tick <= ticks)
+        {
+            list_pop_front(&sleep_list);
+
+            thread_unblock(ptr);
+        }
+        else
+            break;
+    }
+    
+    intr_set_level (old_level);
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
@@ -380,7 +442,7 @@ idle (void *idle_started_ UNUSED) {
 
 		   See [IA32-v2a] "HLT", [IA32-v2b] "STI", and [IA32-v3a]
 		   7.11.1 "HLT Instruction". */
-		asm volatile ("sti; hlt" : : : "memory");
+		asm volatile ("sti; hlt" : : : "memory");   
 	}
 }
 
@@ -587,4 +649,22 @@ allocate_tid (void) {
 	lock_release (&tid_lock);
 
 	return tid;
+}
+
+static bool
+tick_less(const struct list_elem *a_, const struct list_elem *b_)
+{
+    const int64_t a = list_entry(a_, struct thread, elem)->wakeup_tick;
+    const int64_t b = list_entry(b_, struct thread, elem)->wakeup_tick;
+
+    return a < b;
+}
+
+static bool
+priority_more(const struct list_elem *a_, const struct list_elem *b_)
+{
+    const int64_t a = list_entry(a_, struct thread, elem)->priority;
+    const int64_t b = list_entry(b_, struct thread, elem)->priority;
+
+    return a > b;
 }

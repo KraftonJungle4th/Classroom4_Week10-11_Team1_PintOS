@@ -65,7 +65,7 @@ def main():
 
     # Build the command line arguments
     if project == "threads":
-        args = ["--gdb", "--","-q", "-mlfqs", "run", f"{exec_path}:{filename}"]
+        args = ["--gdb", "--","-q", "run", f"{filename}"]
     else:
         args = ["--gdb", "-m 20","--fs-disk=10", "--swap-disk=4", "-p", f"{exec_path}:{filename}"]
 
