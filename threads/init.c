@@ -67,64 +67,78 @@ int main (void) NO_RETURN;
 /* Pintos main program. */
 int
 main (void) {
-	uint64_t mem_end;
-	char **argv;
+    uint64_t mem_end;
+    char **argv;
 
-	/* Clear BSS and get machine's RAM size. */
-	bss_init ();
+    /* Clear BSS and get machine's RAM size. */
+    bss_init ();
 
-	/* Break command line into arguments and parse options. */
-	argv = read_command_line ();
-	argv = parse_options (argv);
+    /* Break command line into arguments and parse options. */
+    argv = read_command_line ();
+    argv = parse_options (argv);
 
-	/* Initialize ourselves as a thread so we can use locks,
-	   then enable console locking. */
-	thread_init ();
-	console_init ();
+    /* Initialize ourselves as a thread so we can use locks,
+       then enable console locking. */
+    thread_init ();
+    // printf ("쓰레드 객체 초기화\n");
+    console_init ();
+    // printf ("콘솔 초기화\n");
 
-	/* Initialize memory system. */
-	mem_end = palloc_init ();
-	malloc_init ();
-	paging_init (mem_end);
+    /* Initialize memory system. */
+    mem_end = palloc_init ();
+    malloc_init ();
+    // printf ("메모리 할당 시스템 초기화\n");
+    paging_init (mem_end);
+    // printf ("페이지 시스템 초기화\n");
 
 #ifdef USERPROG
-	tss_init ();
-	gdt_init ();
+    tss_init ();
+    gdt_init ();
 #endif
 
-	/* Initialize interrupt handlers. */
-	intr_init ();
-	timer_init ();
-	kbd_init ();
-	input_init ();
+    /* Initialize interrupt handlers. */
+    intr_init ();
+    // printf ("인터럽트 객체 초기화\n");
+    timer_init ();
+    // printf ("타이머 인터럽트 초기화\n");
+    kbd_init ();
+    // printf ("키보드 인터럽트 초기화\n");
+    input_init();
+    // printf ("입력 인터럽트 초기화\n");
 #ifdef USERPROG
-	exception_init ();
-	syscall_init ();
+    exception_init();
+    syscall_init();
 #endif
-	/* Start thread scheduler and enable interrupts. */
-	thread_start ();
-	serial_init_queue ();
-	timer_calibrate ();
+    /* Start thread scheduler and enable interrupts. */
+    thread_start ();
+    // printf ("쓰레드 시스템 초기화\n");
+    serial_init_queue();
+    // printf (" 직렬포트기기 초기화\n");
+    timer_calibrate();
+    // printf ("타이머 조정\n");
 
 #ifdef FILESYS
-	/* Initialize file system. */
-	disk_init ();
-	filesys_init (format_filesys);
+    /* Initialize file system. */
+    disk_init ();
+    filesys_init (format_filesys);
 #endif
 
 #ifdef VM
-	vm_init ();
+    vm_init ();
 #endif
 
-	printf ("Boot complete.\n");
+    printf ("Boot complete.\n");
 
-	/* Run actions specified on kernel command line. */
-	run_actions (argv);
+    /* Run actions specified on kernel command line. */
+    run_actions (argv);
 
-	/* Finish up. */
-	if (power_off_when_done)
-		power_off ();
-	thread_exit ();
+    /* Finish up. */
+    if (power_off_when_done)
+    {
+        power_off ();
+        // printf ("컴퓨터 끄는중...\n");
+    }
+    thread_exit ();
 }
 
 /* Clear BSS */
